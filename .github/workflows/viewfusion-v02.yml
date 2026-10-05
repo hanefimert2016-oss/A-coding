@@ -1,0 +1,43 @@
+name: ViewFusion3D v0.2 CPU Demo
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ViewFusion3D-v0.2/RUN'
+
+jobs:
+  cpu-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ViewFusion3D-v0.2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: ViewFusion3D-v0.2/requirements.txt
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+      - name: Tests
+        run: pytest -q
+      - name: Build adaptive 3D demo
+        run: python demo_v02.py --out v02_out --size 192 --stride 2 --target-gap 45
+      - name: Show report
+        run: cat v02_out/report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: viewfusion3d-v02-example
+          path: |
+            ViewFusion3D-v0.2/v02_out/helmet_surfel.ply
+            ViewFusion3D-v0.2/v02_out/helmet_points.glb
+            ViewFusion3D-v0.2/v02_out/helmet_mesh.glb
+            ViewFusion3D-v0.2/v02_out/report.json
+            ViewFusion3D-v0.2/v02_out/views/*.png
+          if-no-files-found: error
