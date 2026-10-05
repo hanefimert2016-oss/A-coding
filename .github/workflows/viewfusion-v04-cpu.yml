@@ -1,0 +1,29 @@
+name: ViewFusion3D v0.4 CPU Creator
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ViewFusion3D-v0.4-CPU/**'
+jobs:
+  cpu-creator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: pip install numpy Pillow trimesh scipy scikit-image
+      - name: Build creator-like GLB on CPU
+        working-directory: ViewFusion3D-v0.4-CPU
+        run: |
+          /usr/bin/time -v python run_cpu_creator.py
+          cat v04_out/report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: viewfusion3d-v04-cpu-creator
+          path: |
+            ViewFusion3D-v0.4-CPU/v04_out/cpu_creator.glb
+            ViewFusion3D-v0.4-CPU/v04_out/basecolor_atlas.png
+            ViewFusion3D-v0.4-CPU/v04_out/report.json
