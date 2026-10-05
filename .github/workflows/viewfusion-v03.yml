@@ -1,0 +1,25 @@
+name: ViewFusion3D v0.3 CPU validation
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ViewFusion3D-v0.3/**'
+      - '.github/workflows/viewfusion-v03.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ViewFusion3D-v0.3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install numpy trimesh scipy pillow
+      - name: Syntax check
+        run: python -m py_compile postprocess_creator.py
+      - name: Verify Kaggle notebook JSON
+        run: python -m json.tool kaggle_sf3d.ipynb >/dev/null
