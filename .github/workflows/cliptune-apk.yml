@@ -1,0 +1,37 @@
+name: ClipTune APK
+on:
+  push:
+    branches: [cliptune-android-mp3-v1]
+    paths:
+      - 'cliptune/**'
+      - '.github/workflows/cliptune-apk.yml'
+  workflow_dispatch:
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout project branch
+        uses: actions/checkout@v4
+      - name: Install Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Unpack and build ClipTune
+        run: bash cliptune/build_from_source.sh
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClipTune-Android-v1-APK
+          path: ClipTune-Android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
