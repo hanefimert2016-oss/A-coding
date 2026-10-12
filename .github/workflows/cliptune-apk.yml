@@ -19,8 +19,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
       - name: Install Android platform
-        run: /usr/local/lib/android/sdk/cmdline-tools/16.0/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0"
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
